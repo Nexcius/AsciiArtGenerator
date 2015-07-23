@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Nexcius.net | Ascii Art Renderer</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script type="text/javascript" src="letter_intensity.js"></script>
+	<script type="text/javascript" src="ascii_renderer.js"></script>
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		header {
+			display: block;
+			box-sizing: border-box;
+			width: 100%;
+			height: 50px;
+			padding: 0 50px;
+			line-height: 50px;
+			background-color: #c3c3c3;
+		}
+	</style>
+</head>
+<body>
+
+<header>
+	<input type="file" id="image-upload"/>
+	<select id="render-scale">
+		<option value="0.25">1:4</option>
+		<option value="0.125" selected>1:8</option>
+		<option value="0.0625">1:16</option>
+		<option value="0.03125">1:32</option>
+	</select>
+	<input type="button" id="render-image" value="Render" disabled />
+	<span id="render-progress"></span>
+</header>
+
+<pre id="letter-container">
+</pre>
+
+<script type="text/javascript">	
+	if(window.File && window.FileReader) {
+		//LetterIntensity.drawLetters($('#letter-container'));
+
+		function update(progress) {
+			$('#render-progress').text(progress + '%');
+			//console.log('Progress: ' + progress + '%');
+		}
+
+		$('#image-upload').change(function() {
+			if(this.files.length > 0 && this.files[0].type.match('^image/')) {
+				$('#render-image').prop("disabled",false);
+			} else {
+				$('#render-image').prop("disabled", true);
+			}
+		});
+
+		$('#render-image').click(function() {
+			$('#letter-container').html("");
+			var scale = $('#render-scale').val();
+
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				var img = new Image();
+				img.src = reader.result;
+				AsciiRenderer.render($('#letter-container'), img, scale, update);
+			};
+			reader.readAsDataURL($('#image-upload')[0].files[0]);
+		});
+	}
+	else {
+		$('#letter-container').text('Your browser is out of date. Plase use a modern browser to continue.');
+	}
+
+</script>
+
+</body>
+</html>
